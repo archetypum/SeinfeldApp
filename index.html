@@ -42,25 +42,31 @@
                         return date;
                     }
 
-                    const controller = {
-                        list: load(),
-                        isChecked: function(index) {
-                            return this.list[index]
-                        },
-                        check: function(index, status) {
-                            if (dateAt(index).getTime() <= today().getTime()) {
-                                list[index] = status;
-                                save(list);
-                            }
-                        }
-                    };
 
-                    checks = function(ctrl, index) {
+                    // UNDERSTAND HOW IT WORKS GODDAMMIT!
+
+                    let list = [];
+
+
+                    
+                    isChecked =  function(index) {
+                        return list[index]
+                    },
+                    check = function(index, status) {
+                        if (dateAt(index).getTime() >= today().getTime()) {
+                            // console.log(status) 
+                            list[index] = status;
+                            save(list);
+                        }
+                    }
+                    
+
+                    checks = function(index) {
                         return {
                             onclick: function() {
-                                controller.check(index, this.checked);
+                                check(index, this.checked);
                             },
-                            checked: controller.isChecked(index)
+                            checked: isChecked(index)
                         };
                     }
 
@@ -78,12 +84,13 @@
 
                     // view
                     return {
-                        view: function(ctrl) {
+                        oninit: () => {list = load()},
+                        view: function() {
                             return m("table", seven(function(y) {
                                 return m("tr", seven(function(x) {
                                     var index = indexAt(x, y)
                                     return m("td", highlights(index), [
-                                        m("input[type=checkbox]", checks(ctrl, index))
+                                        m("input[type=checkbox]", checks(index))
                                     ]);
                                 }));
                             }));
